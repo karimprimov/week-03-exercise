@@ -1,0 +1,403 @@
+---
+title: "EDA-challenge"
+author: "Karim Primov"
+date: "2/6/2022"
+output: html_document
+---
+
+```{r}
+library(sjmisc)
+library(tidyverse)
+f <- "https://raw.githubusercontent.com/difiore/ada-2022-datasets/main/data-wrangling.csv"
+d <- read_csv(f, col_names = TRUE) #creates a tibble
+d
+```
+
+creating variable named "BSD" [ratio of male to female body mass]
+```{r}
+d$bsd <- (d$Body_mass_male_mean/d$Body_mass_female_mean)
+d$bsd
+```
+creating variable named "sex_ratio" [ratio of adult females to adult males]
+```{r}
+d$sex_ratio <- (d$AdultFemale/d$AdultMales)
+d$sex_ratio
+```
+creating variable named "DI" [ratio of day range length to diameter of home range]
+```{r}
+d$DI <- (d$DayLength_km/d$HomeRange_km2)
+d$DI
+```
+Plotting the relationship between day range length and time spent moving
+```{r}
+plot(d$DayLength_km~d$Move)
+```
+
+
+It appears that there's not much of a relationship between time spent moving and day range length, however, most species appear to spend less than 40 mins per day moving
+
+
+
+Plotting the relationship between day range length and log(time spent moving)
+```{r}
+plot(d$DayLength_km~log(d$Move))
+```
+
+
+There still appears to not be much of a relationship 
+
+
+Plotting the relationship between log(day range length) and time spent moving
+```{r}
+plot(log(d$DayLength_km)~d$Move)
+```
+
+
+Data seems skewed to the left
+
+Plotting the relationship between log(day range length) and log(time spent moving)
+```{r}
+plot(log(d$DayLength_km)~log(d$Move))
+```
+
+
+
+Log-transforming both variables shows that overall, species that do spend more time moving travel farther than those who don't
+
+
+
+Plotting the relationship between log(day range length) and log(time spent moving), grouped by family
+```{r}
+p <- ggplot(data = d, aes(x = log(Move), 
+                          y = log(DayLength_km),
+                          color = factor(d$Family)
+                          ))
+p <- p+ xlab("log(Move)") + ylab("log(DayLength_km)")
+p <- p + geom_point(na.rm = TRUE)
+p <- p + theme(legend.position = "bottom", legend.title = element_blank())
+p
+```
+
+
+
+adding marginal univariate plots
+```{r}
+library(ggExtra)
+ggMarginal(p, type = "densigram")
+detach(package:ggExtra)
+```
+
+
+
+
+setting up a grid for faceting by a grouping variable
+```{r}
+p <- p + facet_wrap(~Family, ncol = 4)
+p <- p + theme(legend.position = "none")
+p
+```
+
+
+
+Plotting the relationship between day range length and time group size
+```{r}
+plot(d$DayLength_km~d$MeanGroupSize)
+```
+
+
+
+
+Plotting the relationship between log(day range length) and time group size
+```{r}
+plot(log(d$DayLength_km)~d$MeanGroupSize)
+```
+
+
+
+
+Plotting the relationship between day range length and log(time group size)
+```{r}
+plot(log(d$DayLength_km)~d$MeanGroupSize)
+```
+
+
+
+
+Plotting the relationship between log(day range length) and log(time group size)
+```{r}
+plot(log(d$DayLength_km)~log(d$MeanGroupSize))
+```
+
+
+
+
+Plotting the relationship between day range length and time group size, grouped by family
+```{r}
+p <- ggplot(data = d, aes(x = MeanGroupSize, 
+                          y = DayLength_km,
+                          color = factor(d$Family)
+                          ))
+p <- p+ xlab("log(MeanGroupSize)") + ylab("log(DayLength_km)")
+p <- p + geom_point(na.rm = TRUE)
+p <- p + theme(legend.position = "bottom", legend.title = element_blank())
+p
+```
+
+
+
+
+adding marginal univariate plots
+```{r}
+library(ggExtra)
+ggMarginal(p, type = "densigram")
+detach(package:ggExtra)
+```
+
+
+
+
+
+setting up a grid for faceting by a grouping variable
+```{r}
+p <- p + facet_wrap(~Family, ncol = 4)
+p <- p + theme(legend.position = "none")
+p
+```
+
+
+
+no apparent relationship between day range length and mean group size
+
+
+
+Plotting the relationship between log(day range length) and log(time group size), grouped by family
+```{r}
+p <- ggplot(data = d, aes(x = log(MeanGroupSize), 
+                          y = log(DayLength_km),
+                          color = factor(d$Family)
+                          ))
+p <- p+ xlab("log(MeanGroupSize)") + ylab("log(DayLength_km)")
+p <- p + geom_point(na.rm = TRUE)
+p <- p + theme(legend.position = "bottom", legend.title = element_blank())
+p
+```
+
+
+
+
+adding marginal univariate plots
+```{r}
+library(ggExtra)
+ggMarginal(p, type = "densigram")
+detach(package:ggExtra)
+```
+
+
+
+
+
+setting up a grid for faceting by a grouping variable
+```{r}
+p <- p + facet_wrap(~Family, ncol = 4)
+p <- p + theme(legend.position = "none")
+p
+```
+
+
+
+Cebidae appears to have positive relationship between day range length and mean group size, when both variables log-transformed
+
+
+
+Plotting the relationship between body size dimorphism and canine size dimorphism, both overall and by family
+
+Plotting the relationship between body size dimorphism and canine size dimorphism, overall
+```{r}
+plot(d$Canine_Dimorphism~d$bsd)
+```
+
+
+
+
+Plotting the relationship between log(body size dimorphism) and log(canine size dimorphism), overall
+```{r}
+plot(log(d$Canine_Dimorphism)~log(d$bsd))
+```
+
+
+
+Points more spread out, positive, nonlinear relationship between bsd and Canine dimorphism
+
+Plotting the relationship between body size dimorphism and canine size dimorphism, grouped by family
+```{r}
+p <- ggplot(data = d, aes(x = bsd, 
+                          y = Canine_Dimorphism,
+                          color = factor(d$Family)
+                          ))
+p <- p+ xlab("bsd") + ylab("Canine_Dimorphism")
+p <- p + geom_point(na.rm = TRUE)
+p <- p + theme(legend.position = "bottom", legend.title = element_blank())
+p
+```
+
+
+
+
+adding marginal univariate plots
+```{r}
+library(ggExtra)
+ggMarginal(p, type = "densigram")
+detach(package:ggExtra)
+```
+
+
+
+
+setting up a grid for faceting by a grouping variable
+```{r}
+p <- p + facet_wrap(~Family, ncol = 4)
+p <- p + theme(legend.position = "none")
+p
+```
+
+
+
+Cercopithecidae exhibits somewhat of a linear relationship between bsd and Canine dimorphism, Cebidae does as well yet with fewer data points (limited certainty)
+
+
+
+Plotting the relationship between log(body size dimorphism) and log(canine size dimorphism), grouped by family
+```{r}
+p <- ggplot(data = d, aes(x = log(bsd), 
+                          y = log(Canine_Dimorphism),
+                          color = factor(d$Family)
+                          ))
+p <- p+ xlab("log(bsd)") + ylab("log(Canine_Dimorphism)")
+p <- p + geom_point(na.rm = TRUE)
+p <- p + theme(legend.position = "bottom", legend.title = element_blank())
+p
+```
+
+
+
+
+adding marginal univariate plots
+```{r}
+library(ggExtra)
+ggMarginal(p, type = "densigram")
+detach(package:ggExtra)
+```
+
+
+setting up a grid for faceting by a grouping variable
+```{r}
+p <- p + facet_wrap(~Family, ncol = 4)
+p <- p + theme(legend.position = "none")
+p
+```
+
+
+
+
+Cercopithecidae also exhibits somewhat of a linear relationship between log (bsd) and log (Canine dimorphism), and Cebidae does as well yet with fewer data points (limited certainty)
+
+
+Diet strategy analysis 
+
+
+```{r}
+d <- mutate(
+  d,
+  "diet" = case_when(
+    Fruit >= 50 ~ "frugivore", 
+    Leaves >= 50 ~ "folivore",
+    Fruit < 50 & Leaves < 50 ~ "omnivore"
+  )
+)
+
+```
+
+
+
+
+Boxplots of group size vs dietary strategies
+```{r}
+boxplot(d$MeanGroupSize~d$diet)
+```
+
+
+
+
+Frugivores, on average, live in smaller groups than folivores, however, there's much larger variability in frugivore data
+compared to folivores
+
+
+One line code using forward pipe operator
+
+```{r}
+s <- mutate(d, Binomial = paste(Genus, Species, sep = " ")) %>%
+  select(Binomial,
+         Family,
+         Brain_Size_Species_Mean,
+         Body_mass_male_mean
+         ) %>%
+  group_by(Family) %>%
+  summarise(
+    avgbrainsize = mean(Brain_Size_Species_Mean, na.rm = TRUE),
+    avgbodymass = mean(Body_mass_male_mean, na.rm = TRUE),
+  ) %>%
+  arrange(desc(avgbrainsize))
+s
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,20 @@
+---
+title: "week.03.exercise"
+author: "Karim Primov"
+date: "2/6/2022"
+output: html_document
+---
+
+```{r}
+library(sjmisc)
+library(tidyverse)
+f <- "https://raw.githubusercontent.com/difiore/ada-2022-datasets/main/data-wrangling.csv"
+d <- read_csv(f, col_names = TRUE) #creates a tibble
+d
+#alternatively
+names(d)
+```
+
+```{r}
+
+```
